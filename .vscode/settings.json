@@ -2,7 +2,8 @@
     "cSpell.words": [
         "Antlr",
         "expressivo",
-        "localctx"
+        "localctx",
+        "Simpify"
     ],
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.debug.settings.onBuildFailureProceed": true

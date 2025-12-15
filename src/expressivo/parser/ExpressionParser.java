@@ -20,18 +20,18 @@ public class ExpressionParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, NUMBER=4, SPACES=5;
+		T__0=1, T__1=2, T__2=3, T__3=4, NUMBER=5, VARIABLE=6, SPACES=7;
 	public static final int
-		RULE_root = 0, RULE_sum = 1, RULE_primitive = 2, RULE_configuration = 3;
+		RULE_root = 0, RULE_sum = 1, RULE_product = 2, RULE_primitive = 3, RULE_configuration = 4;
 	public static final String[] ruleNames = {
-		"root", "sum", "primitive", "configuration"
+		"root", "sum", "product", "primitive", "configuration"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'+'", "'('", "')'"
+		null, "'+'", "'*'", "'('", "')'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, "NUMBER", "SPACES"
+		null, null, null, null, null, "NUMBER", "VARIABLE", "SPACES"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -124,9 +124,9 @@ public class ExpressionParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(8);
+			setState(10);
 			sum();
-			setState(9);
+			setState(11);
 			match(EOF);
 			}
 		}
@@ -142,11 +142,11 @@ public class ExpressionParser extends Parser {
 	}
 
 	public static class SumContext extends ParserRuleContext {
-		public List<PrimitiveContext> primitive() {
-			return getRuleContexts(PrimitiveContext.class);
+		public List<ProductContext> product() {
+			return getRuleContexts(ProductContext.class);
 		}
-		public PrimitiveContext primitive(int i) {
-			return getRuleContext(PrimitiveContext.class,i);
+		public ProductContext product(int i) {
+			return getRuleContext(ProductContext.class,i);
 		}
 		public SumContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -169,21 +169,80 @@ public class ExpressionParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(11);
-			primitive();
-			setState(16);
+			setState(13);
+			product();
+			setState(18);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__0) {
 				{
 				{
-				setState(12);
+				setState(14);
 				match(T__0);
-				setState(13);
+				setState(15);
+				product();
+				}
+				}
+				setState(20);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class ProductContext extends ParserRuleContext {
+		public List<PrimitiveContext> primitive() {
+			return getRuleContexts(PrimitiveContext.class);
+		}
+		public PrimitiveContext primitive(int i) {
+			return getRuleContext(PrimitiveContext.class,i);
+		}
+		public ProductContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_product; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ExpressionListener ) ((ExpressionListener)listener).enterProduct(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ExpressionListener ) ((ExpressionListener)listener).exitProduct(this);
+		}
+	}
+
+	public final ProductContext product() throws RecognitionException {
+		ProductContext _localctx = new ProductContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_product);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(21);
+			primitive();
+			setState(26);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==T__1) {
+				{
+				{
+				setState(22);
+				match(T__1);
+				setState(23);
 				primitive();
 				}
 				}
-				setState(18);
+				setState(28);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -202,6 +261,7 @@ public class ExpressionParser extends Parser {
 
 	public static class PrimitiveContext extends ParserRuleContext {
 		public TerminalNode NUMBER() { return getToken(ExpressionParser.NUMBER, 0); }
+		public TerminalNode VARIABLE() { return getToken(ExpressionParser.VARIABLE, 0); }
 		public SumContext sum() {
 			return getRuleContext(SumContext.class,0);
 		}
@@ -221,26 +281,33 @@ public class ExpressionParser extends Parser {
 
 	public final PrimitiveContext primitive() throws RecognitionException {
 		PrimitiveContext _localctx = new PrimitiveContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_primitive);
+		enterRule(_localctx, 6, RULE_primitive);
 		try {
-			setState(24);
+			setState(35);
 			switch (_input.LA(1)) {
 			case NUMBER:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(19);
+				setState(29);
 				match(NUMBER);
 				}
 				break;
-			case T__1:
+			case VARIABLE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(20);
-				match(T__1);
-				setState(21);
-				sum();
-				setState(22);
+				setState(30);
+				match(VARIABLE);
+				}
+				break;
+			case T__2:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(31);
 				match(T__2);
+				setState(32);
+				sum();
+				setState(33);
+				match(T__3);
 				}
 				break;
 			default:
@@ -275,7 +342,7 @@ public class ExpressionParser extends Parser {
 
 	public final ConfigurationContext configuration() throws RecognitionException {
 		ConfigurationContext _localctx = new ConfigurationContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_configuration);
+		enterRule(_localctx, 8, RULE_configuration);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -293,15 +360,17 @@ public class ExpressionParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\7\37\4\2\t\2\4\3"+
-		"\t\3\4\4\t\4\4\5\t\5\3\2\3\2\3\2\3\3\3\3\3\3\7\3\21\n\3\f\3\16\3\24\13"+
-		"\3\3\4\3\4\3\4\3\4\3\4\5\4\33\n\4\3\5\3\5\3\5\2\2\6\2\4\6\b\2\2\34\2\n"+
-		"\3\2\2\2\4\r\3\2\2\2\6\32\3\2\2\2\b\34\3\2\2\2\n\13\5\4\3\2\13\f\7\2\2"+
-		"\3\f\3\3\2\2\2\r\22\5\6\4\2\16\17\7\3\2\2\17\21\5\6\4\2\20\16\3\2\2\2"+
-		"\21\24\3\2\2\2\22\20\3\2\2\2\22\23\3\2\2\2\23\5\3\2\2\2\24\22\3\2\2\2"+
-		"\25\33\7\6\2\2\26\27\7\4\2\2\27\30\5\4\3\2\30\31\7\5\2\2\31\33\3\2\2\2"+
-		"\32\25\3\2\2\2\32\26\3\2\2\2\33\7\3\2\2\2\34\35\3\2\2\2\35\t\3\2\2\2\4"+
-		"\22\32";
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\t*\4\2\t\2\4\3\t"+
+		"\3\4\4\t\4\4\5\t\5\4\6\t\6\3\2\3\2\3\2\3\3\3\3\3\3\7\3\23\n\3\f\3\16\3"+
+		"\26\13\3\3\4\3\4\3\4\7\4\33\n\4\f\4\16\4\36\13\4\3\5\3\5\3\5\3\5\3\5\3"+
+		"\5\5\5&\n\5\3\6\3\6\3\6\2\2\7\2\4\6\b\n\2\2(\2\f\3\2\2\2\4\17\3\2\2\2"+
+		"\6\27\3\2\2\2\b%\3\2\2\2\n\'\3\2\2\2\f\r\5\4\3\2\r\16\7\2\2\3\16\3\3\2"+
+		"\2\2\17\24\5\6\4\2\20\21\7\3\2\2\21\23\5\6\4\2\22\20\3\2\2\2\23\26\3\2"+
+		"\2\2\24\22\3\2\2\2\24\25\3\2\2\2\25\5\3\2\2\2\26\24\3\2\2\2\27\34\5\b"+
+		"\5\2\30\31\7\4\2\2\31\33\5\b\5\2\32\30\3\2\2\2\33\36\3\2\2\2\34\32\3\2"+
+		"\2\2\34\35\3\2\2\2\35\7\3\2\2\2\36\34\3\2\2\2\37&\7\7\2\2 &\7\b\2\2!\""+
+		"\7\5\2\2\"#\5\4\3\2#$\7\6\2\2$&\3\2\2\2%\37\3\2\2\2% \3\2\2\2%!\3\2\2"+
+		"\2&\t\3\2\2\2\'(\3\2\2\2(\13\3\2\2\2\5\24\34%";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
