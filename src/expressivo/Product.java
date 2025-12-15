@@ -3,7 +3,7 @@ package expressivo;
 /**
  * An immutable product expression of two Expressions.
  */
-public class Product implements Expression {
+public class Product implements ExpressionWithOperation {
     private final Expression left;
     private final Expression right;
 
@@ -67,4 +67,30 @@ public class Product implements Expression {
         return 31 * left.hashCode() + right.hashCode();
     }
 
+    /**
+     * Differentiate this product with respect to a variable.
+     * d/dx[left * right] = d/dx[left] * right + left * d/dx[right]
+     * x is the variable to differentiate by
+     * So the result is Sum(Product(left.differentiate(x), right), Product(left,
+     * right.differentiate(x)))
+     * Simplify:
+     ** If left.differentiate(x) is 0, then the first part is 0, drop it;
+     ** If right.differentiate(x) is 0, then the second part is 0, drop it;
+     ** If both parts are 0, return Number(0);
+     ** If either part is Number(1), drop it from the product.
+     ** The Sum of the two parts also need to be simplify, like in
+     * Sum.differentiate().
+     * 
+     * @param variable the variable to differentiate by, a case-sensitive
+     *                 nonempty string of letters.
+     * @return expression's derivative of this product with respect to variable.
+     */
+    @Override
+    public Expression differentiate(String variable) {
+        Expression leftDerivative = left.differentiate(variable);
+        Expression rightDerivative = right.differentiate(variable);
+        Expression leftPart = ((ExpressionWithOperation) leftDerivative).mulRight(right);
+        Expression rightPart = ((ExpressionWithOperation) left).mulRight(rightDerivative);
+        return ((ExpressionWithOperation) leftPart).addToRight(rightPart);
+    }
 }

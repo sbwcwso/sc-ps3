@@ -3,6 +3,8 @@
  */
 package expressivo;
 
+import java.util.Map;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -47,6 +49,30 @@ public interface Expression {
     }
 
     /**
+     * Differentiate this expression with respect to a variable.
+     * 
+     * @param variable the variable to differentiate by, a case-sensitive
+     *                 nonempty string of letters.
+     * @return expression's derivative with respect to variable. Must be a valid
+     *         expression equal to the derivative, but doesn't need to be in
+     *         simplest or canonical form.
+     * @throws IllegalArgumentException if the variable is invalid
+     */
+    public Expression differentiate(String variable);
+
+    /**
+     * Simplify this expression with respect to the given environment.
+     * 
+     * @param environment maps variables to values. Variables are required to be
+     *                    case-sensitive nonempty strings of letters. The set of
+     *                    variables in environment is allowed to be different than
+     *                    the set of variables actually found in this expression.
+     *                    Values must be nonnegative numbers.
+     * @return
+     */
+    // public Expression simplify(Map<String, Double> environment);
+
+    /**
      * @return a parsable representation of this expression, such that
      *         for all e:Expression, e.equals(Expression.parse(e.toString())).
      */
@@ -75,7 +101,101 @@ public interface Expression {
     @Override
     public int hashCode();
 
-    // TODO more instance methods
+}
+
+interface ExpressionWithOperation extends Expression {
+    /**
+     * Add this expression to the right expression.
+     * 
+     * @param right the right expression
+     * @return a new Sum expression object
+     */
+    default Expression addToRight(Expression right) {
+        // Delegate to right operand to allow symmetric simplifications
+        return ((ExpressionWithOperation) right).addToLeft(this);
+    }
+
+    /**
+     * Helper for double dispatch: add a Number to this expression.
+     * This method is called when the left operand of the addition is known to be a
+     * Number.
+     *
+     * @param leftNumber the number on the left side of the addition
+     * @return the sum of left and this
+     */
+    default Expression addWithLeftNumber(Number leftNumber) {
+        return new Sum(leftNumber, this);
+    }
+
+    /**
+     * Internal hook for symmetric addition: handle (left + this).
+     * Default behavior constructs a Sum without simplification.
+     * 
+     * @param left the left expression
+     * @return the sum of left and this
+     */
+    default Expression addToLeft(Expression left) {
+        return new Sum(left, this);
+    }
+
+    /**
+     * Helper for double dispatch: add this expression to a Number on the right.
+     * This method is called when the right operand of the addition is known to be a
+     * Number.
+     * 
+     * @param rightNumber the number on the right side of the addition
+     * @return the sum of this and rightNumber
+     */
+    default Expression addWithRightNumber(Number rightNumber) {
+        return new Sum(this, rightNumber);
+    }
+
+    /**
+     * Multiply this expression to the right expression.
+     * 
+     * @param right the right expression
+     * @return a new Product expression object
+     */
+    default Expression mulRight(Expression right) {
+        // Delegate to right operand to allow symmetric simplifications
+        return ((ExpressionWithOperation) right).mulLeft(this);
+    }
+
+    /**
+     * Internal hook for symmetric multiplication: handle (left * this).
+     * Default behavior constructs a Product without simplification.
+     * 
+     * @param left the left expression
+     * @return the product of left and this
+     */
+    default Expression mulLeft(Expression left) {
+        return new Product(left, this);
+    }
+
+    /**
+     * Helper for double dispatch: multiply a Number to this expression.
+     * This method is called when the left operand of the multiplication is known to
+     * be a Number.
+     *
+     * @param leftNumber the number on the left side of the multiplication
+     * @return the product of left and this
+     */
+    default Expression mulLeftNumber(Number leftNumber) {
+        return new Product(leftNumber, this);
+    }
+
+    /**
+     * Helper for double dispatch: multiply this expression to a Number on the
+     * right.
+     * This method is called when the right operand of the multiplication is known
+     * to be a Number.
+     * 
+     * @param rightNumber the number on the right side of the multiplication
+     * @return the product of this and rightNumber
+     */
+    default Expression mulRightNumber(Number rightNumber) {
+        return new Product(this, rightNumber);
+    }
 
 }
 
@@ -199,5 +319,4 @@ class ExpressionParserHelper {
         public void exitConfiguration(expressivo.parser.ExpressionParser.ConfigurationContext ctx) {
         }
     }
-
 }

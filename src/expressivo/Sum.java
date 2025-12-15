@@ -3,7 +3,7 @@ package expressivo;
 /**
  * An immutable sum expression of two Expressions.
  */
-public class Sum implements Expression {
+public class Sum implements ExpressionWithOperation {
     private final Expression left;
     private final Expression right;
 
@@ -65,5 +65,24 @@ public class Sum implements Expression {
     @Override
     public int hashCode() {
         return left.hashCode() * 31 + right.hashCode();
+    }
+
+    /**
+     * Differentiate this sum with respect to a variable.
+     * d/dx[left + right] = d/dx[left] + d/dx[right]
+     * x is the variable to differentiate by
+     * So the result is Sum(left.differentiate(x), right.differentiate(x))
+     * Simpify:
+     ** If either left or right is 0, drop it;
+     ** If both left and right are numbers, fold them into a single number
+     * 
+     * @param variable the variable to differentiate by, a case-sensitive
+     *                 nonempty string of letters.
+     * @return Expression representing the derivative of this sum with respect to
+     *         the given variable.
+     */
+    @Override
+    public Expression differentiate(String variable) {
+        return ((ExpressionWithOperation) left.differentiate(variable)).addToRight(right.differentiate(variable));
     }
 }

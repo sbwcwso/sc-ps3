@@ -19,6 +19,10 @@ public class VariableTest {
     // *** equal variable names
     // *** unequal variable names
     // *** case-sensitive variable names
+    // * Test differentiate() method
+    // ** Partition the input space as follows:
+    // *** differentiate with the same variable name
+    // *** differentiate with a different variable name
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -80,5 +84,19 @@ public class VariableTest {
         Variable var1 = new Variable("x");
         Variable var2 = new Variable("X");
         assertFalse(var1.equals(var2));
+    }
+
+    @Test
+    public void testDifferentiateSameVariable() {
+        Variable var = new Variable("x");
+        Expression derivative = var.differentiate("x");
+        assertEquals(new Number(1), derivative);
+    }
+
+    @Test
+    public void testDifferentiateDifferentVariable() {
+        Variable var = new Variable("x");
+        Expression derivative = var.differentiate("y");
+        assertEquals(new Number(0), derivative);
     }
 }

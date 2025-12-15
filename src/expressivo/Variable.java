@@ -7,7 +7,7 @@ package expressivo;
  * IllegalArgumentException is thrown
  * 
  */
-public class Variable implements Expression {
+public class Variable implements ExpressionWithOperation {
     private final String name;
 
     // Abstraction function:
@@ -70,4 +70,16 @@ public class Variable implements Expression {
         return name.hashCode();
     }
 
+    /**
+     * Differentiate this variable with respect to a variable.
+     * 
+     * @param variable the variable to differentiate by, a case-sensitive
+     *                 nonempty string of letters.
+     * @return If the variable is the same as this variable, return Number(1); else
+     *         return Number(0).
+     */
+    @Override
+    public Expression differentiate(String variable) {
+        return new Number(this.name.equals(variable) ? 1 : 0);
+    }
 }

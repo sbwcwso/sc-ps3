@@ -20,7 +20,9 @@ public class NumberTest {
     // *** equal int numbers
     // *** equal floating-point numbers
     // *** unequal numbers
-    //
+    // * Test differentiate() method
+    // ** Partition the input space as follows:
+    // *** differentiate with respect to any variable
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -103,5 +105,13 @@ public class NumberTest {
         num2 = new Number(2.718234);
         assertEquals(num1, num2);
         assertEquals(num1.hashCode(), num2.hashCode());
+    }
+
+    // test differentiate() method
+    @Test
+    public void testDifferentiate() {
+        Number num = new Number(5.0);
+        Expression derivative = num.differentiate("x");
+        assertEquals(new Number(0), derivative);
     }
 }

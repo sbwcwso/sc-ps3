@@ -5,7 +5,7 @@ package expressivo;
  * numbers
  * If the number is negative, throw IllegalArgumentException
  */
-public class Number implements Expression {
+public class Number implements ExpressionWithOperation {
     private final double value;
 
     // Abstraction function:
@@ -66,5 +66,155 @@ public class Number implements Expression {
     @Override
     public int hashCode() {
         return Double.hashCode(value);
+    }
+
+    /**
+     * Differentiate this number with respect to a variable.
+     * 
+     * @param variable the variable to differentiate by, a case-sensitive
+     *                 nonempty string of letters.
+     * @return return Number(0).
+     */
+    @Override
+    public Expression differentiate(String variable) {
+        return new Number(0);
+    }
+
+    /**
+     * Helper for double dispatch: add this number to an expression on the right.
+     * This method is called when the left operand of the addition is known to be a
+     * Number.
+     * 
+     * @param right the right expression
+     * @return the sum of this and right
+     *         if this number is 0, return right
+     *         otherwise, delegate to right.plusLeftNumber(this)
+     */
+    @Override
+    public Expression addToRight(Expression right) {
+        // this is the left operand; drop it if it's zero
+        if (value == 0) {
+            return right;
+        }
+        return ((ExpressionWithOperation) right).addWithLeftNumber(this);
+    }
+
+    /**
+     * Helper for double dispatch: add this number to an expression on the left.
+     * This method is called when the right operand of the addition is known to be a
+     * Number.
+     * 
+     * @param leftNumber the left number
+     * @return the sum of leftNumber and this
+     */
+    public Expression addWithLeftNumber(Number leftNumber) {
+        return new Number(leftNumber.value + this.value);
+    }
+
+    /**
+     * Helper for double dispatch: add this number to an expression on the left.
+     * This method is called when the right operand of the addition is known to be
+     * not a Number.
+     * 
+     * @param left the left expression
+     * @return the sum of left and this
+     *         if this number is 0, return left
+     *         otherwise, delegate to left.plusRightNumber(this)
+     */
+    @Override
+    public Expression addToLeft(Expression left) {
+        // this is the right operand; drop it if it's zero
+        if (this.value == 0) {
+            return left;
+        }
+        return ((ExpressionWithOperation) left).addWithRightNumber(this);
+    }
+
+    /**
+     * Helper for double dispatch: add this number to a Number on the right.
+     * This method is called when the right operand of the addition is known to be a
+     * Number.
+     * 
+     * @param rightNumber the number on the right side of the addition
+     * @return the sum of this and rightNumber
+     */
+    @Override
+    public Expression addWithRightNumber(Number left) {
+        // both operands are numbers: fold
+        return new Number(left.value + this.value);
+    }
+
+    /**
+     * Helper for double dispatch: multiply this number to an expression on the
+     * right.
+     * This method is called when the left operand of the multiplication is known
+     * to be a Number.
+     * 
+     * @param right the right expression
+     * @return the product of this and right
+     *         if this number is 0, return Number(0)
+     *         if this number is 1, return right
+     *         otherwise, delegate to right.mulLeft(this)
+     */
+    @Override
+    public Expression mulRight(Expression right) {
+        if (this.value == 0) {
+            return new Number(0);
+        }
+        if (this.value == 1) {
+            return right;
+        }
+        return ((ExpressionWithOperation) right).mulLeftNumber(this);
+    }
+
+    /**
+     * Helper for double dispatch: multiply this number to an expression on the
+     * left.
+     * This method is called when the right operand of the multiplication is known
+     * to be a Number.
+     * 
+     * @param rightNumber the number on the right side of the multiplication
+     * @return the product of this and rightNumber
+     */
+    public Expression mulLeftNumber(Number rightNumber) {
+        // both operands are numbers: fold
+        return new Number(this.value * rightNumber.value);
+    }
+
+    /**
+     * Helper for double dispatch: multiply this number to an expression on the
+     * left.
+     * This method is called when the right operand of the multiplication is known
+     * to be a Number.
+     * 
+     * @param left the left expression
+     * @return the product of left and this
+     *         if this number is 0, return Number(0)
+     *         if this number is 1, return left
+     *         otherwise, delegate to left.mulRightNumber(this)
+     */
+    @Override
+    public Expression mulLeft(Expression left) {
+        if (this.value == 0) {
+            return new Number(0);
+        }
+        if (this.value == 1) {
+            return left;
+        }
+        return ((ExpressionWithOperation) left).mulRightNumber(this);
+    }
+
+    /**
+     * Helper for double dispatch: multiply this number to a Number on the left.
+     * This method is called when the right operand of the multiplication is known
+     * to be a Number.
+     * 
+     * @param leftNumber the left number
+     * @return the product of this and leftNumber
+     */
+    @Override
+    public Expression mulRightNumber(Number leftNumber) {
+        // both operands are numbers: fold
+        return new Number(this.value * leftNumber.value);
     }
 }
