@@ -81,6 +81,21 @@ public class Number implements ExpressionWithOperation {
     }
 
     /**
+     * Simplify this number with respect to an environment.
+     * 
+     * @param environment maps variables to values. Variables are required to be
+     *                    case-sensitive nonempty strings of letters. The set of
+     *                    variables in environment is allowed to be different than
+     *                    the set of variables actually found in expression. Values
+     *                    must be nonnegative numbers.
+     * @return this number itself.
+     */
+    @Override
+    public Expression simplify(java.util.Map<String, Double> environment) {
+        return this;
+    }
+
+    /**
      * Helper for double dispatch: add this number to an expression on the right.
      * This method is called when the left operand of the addition is known to be a
      * Number.

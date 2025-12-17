@@ -1,5 +1,7 @@
 package expressivo;
 
+import java.util.Map;
+
 /**
  * An immutable sum expression of two Expressions.
  */
@@ -84,5 +86,26 @@ public class Sum implements ExpressionWithOperation {
     @Override
     public Expression differentiate(String variable) {
         return ((ExpressionWithOperation) left.differentiate(variable)).addToRight(right.differentiate(variable));
+    }
+
+    /**
+     * Simplify this sum with respect to an environment.
+     * 
+     * @param environment maps variables to values. Variables are required to be
+     *                    case-sensitive nonempty strings of letters. The set of
+     *                    variables in environment is allowed to be different than
+     *                    the set of variables actually found in expression. Values
+     *                    must be nonnegative numbers.
+     * @return a simplified expression after simplifying both left and right
+     *         expressions with respect to the environment, and applying sum
+     *         simplification rules:
+     **         If either left or right is 0, drop it;
+     **         If both left and right are numbers, fold them into a single number
+     */
+    @Override
+    public Expression simplify(Map<String, Double> environment) {
+        Expression simplifiedLeft = left.simplify(environment);
+        Expression simplifiedRight = right.simplify(environment);
+        return ((ExpressionWithOperation) simplifiedLeft).addToRight(simplifiedRight);
     }
 }

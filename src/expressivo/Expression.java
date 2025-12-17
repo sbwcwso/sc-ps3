@@ -70,7 +70,7 @@ public interface Expression {
      *                    Values must be nonnegative numbers.
      * @return
      */
-    // public Expression simplify(Map<String, Double> environment);
+    public Expression simplify(Map<String, Double> environment);
 
     /**
      * @return a parsable representation of this expression, such that

@@ -34,6 +34,19 @@ public class SumTest {
     // *** differentiate with respect to left operand variable
     // *** differentiate with respect to right operand variable
     // *** differentiate with respect to both operand variables
+    //
+    // * Test simplify() method
+    // ** the basic combinations of operand types
+    // ** empty environment, 1, 2, or more mappings
+    // ** environment with extra variables not in expression
+    // ** variables with different case in environment
+    // ** variables with multi-letter names in environment
+    // ** all variables not in environment
+    // ** all variables in environment
+    // ** some variables in environment
+    // *** Only left operand variable in environment
+    // *** Only right operand variable in environment
+    // *** Both operand variables in environment
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -772,4 +785,389 @@ public class SumTest {
         // ((1 * 2) + (x * 0)) + ((0 * x) + (3 * 1))
         assertEquals(new Number(5), derivative);
     }
+
+    // simplify() tests (empty environment) - small numbered cases
+
+    /* S01: left Number, right Number */
+    @Test
+    public void testSimplify01() {
+        Sum sum = new Sum(new Number(2), new Number(3));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(5), simplified);
+    }
+
+    /* S02: left Number, right Variable */
+    @Test
+    public void testSimplify02() {
+        Sum sum = new Sum(new Number(2), new Variable("x"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Number(2), new Variable("x")), simplified);
+    }
+
+    /* S03: left Number, right Sum */
+    @Test
+    public void testSimplify03() {
+        Sum sum = new Sum(new Number(2), new Sum(new Number(1), new Variable("y")));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Number(2), new Sum(new Number(1), new Variable("y"))), simplified);
+    }
+
+    /* S04: left Number, right Product */
+    @Test
+    public void testSimplify04() {
+        Sum sum = new Sum(new Number(2), new Product(new Variable("y"), new Number(3)));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Number(2), new Product(new Variable("y"), new Number(3))), simplified);
+    }
+
+    /* S05: left Variable, right Number */
+    @Test
+    public void testSimplify05() {
+        Sum sum = new Sum(new Variable("x"), new Number(3));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Number(3)), simplified);
+    }
+
+    /* S06: left Variable, right Variable */
+    @Test
+    public void testSimplify06() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Variable("y")), simplified);
+    }
+
+    /* S07: left Variable, right Sum */
+    @Test
+    public void testSimplify07() {
+        Sum sum = new Sum(new Variable("x"), new Sum(new Number(1), new Variable("y")));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Sum(new Number(1), new Variable("y"))), simplified);
+    }
+
+    /* S08: left Variable, right Product */
+    @Test
+    public void testSimplify08() {
+        Sum sum = new Sum(new Variable("x"), new Product(new Variable("y"), new Number(3)));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Product(new Variable("y"), new Number(3))), simplified);
+    }
+
+    /* S09: left Sum, right Number */
+    @Test
+    public void testSimplify09() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("y")), new Number(3));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Sum(new Number(1), new Variable("y")), new Number(3)), simplified);
+    }
+
+    /* S10: left Sum, right Variable */
+    @Test
+    public void testSimplify10() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("y")), new Variable("x"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Sum(new Number(1), new Variable("y")), new Variable("x")), simplified);
+    }
+
+    /* S11: left Sum, right Sum */
+    @Test
+    public void testSimplify11() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("y")), new Sum(new Number(2), new Variable("z")));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Sum(new Number(1), new Variable("y")), new Sum(new Number(2), new Variable("z"))),
+                simplified);
+    }
+
+    /* S12: left Sum, right Product */
+    @Test
+    public void testSimplify12() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("y")), new Product(new Variable("z"), new Number(3)));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Sum(new Number(1), new Variable("y")), new Product(new Variable("z"), new Number(3))),
+                simplified);
+    }
+
+    /* S13: left Product, right Number */
+    @Test
+    public void testSimplify13() {
+        Sum sum = new Sum(new Product(new Variable("y"), new Number(3)), new Number(4));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Product(new Variable("y"), new Number(3)), new Number(4)), simplified);
+    }
+
+    /* S14: left Product, right Variable */
+    @Test
+    public void testSimplify14() {
+        Sum sum = new Sum(new Product(new Variable("y"), new Number(3)), new Variable("x"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Product(new Variable("y"), new Number(3)), new Variable("x")), simplified);
+    }
+
+    /* S15: left Product, right Sum */
+    @Test
+    public void testSimplify15() {
+        Sum sum = new Sum(new Product(new Variable("y"), new Number(3)), new Sum(new Number(1), new Variable("z")));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Product(new Variable("y"), new Number(3)), new Sum(new Number(1), new Variable("z"))),
+                simplified);
+    }
+
+    /* S16: left Product, right Product */
+    @Test
+    public void testSimplify16() {
+        Sum sum = new Sum(new Product(new Variable("y"), new Number(3)), new Product(new Number(4), new Variable("z")));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(
+                new Sum(new Product(new Variable("y"), new Number(3)), new Product(new Number(4), new Variable("z"))),
+                simplified);
+    }
+
+    /* S17: number+number unchanged with non-empty env */
+    @Test
+    public void testSimplify17() {
+        Sum sum = new Sum(new Number(2), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 9.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(5), simplified);
+    }
+
+    /* S18: number+variable where variable is in env */
+    @Test
+    public void testSimplify18() {
+        Sum sum = new Sum(new Number(2), new Variable("x"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(5), simplified);
+    }
+
+    /* S19: number+variable with unrelated env */
+    @Test
+    public void testSimplify19() {
+        Sum sum = new Sum(new Number(2), new Variable("x"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Number(2), new Variable("x")), simplified);
+    }
+
+    /* S20: variable+number where left variable is in env */
+    @Test
+    public void testSimplify20() {
+        Sum sum = new Sum(new Variable("x"), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(7), simplified);
+    }
+
+    /* S21: variable+number with unrelated env */
+    @Test
+    public void testSimplify21() {
+        Sum sum = new Sum(new Variable("x"), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Number(3)), simplified);
+    }
+
+    /* S22: var+var with only left in env */
+    @Test
+    public void testSimplify22() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Number(2), new Variable("y")), simplified);
+    }
+
+    /* S23: var+var with only right in env */
+    @Test
+    public void testSimplify23() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Number(3)), simplified);
+    }
+
+    /* S24: var+var with both in env */
+    @Test
+    public void testSimplify24() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        env.put("y", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(5), simplified);
+    }
+
+    /* S25: var + (number + var) with right inner var in env */
+    @Test
+    public void testSimplify25() {
+        Sum sum = new Sum(new Variable("x"), new Sum(new Number(2), new Variable("y")));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Number(5)), simplified);
+    }
+
+    /* S26: var + (number + var) with both vars in env */
+    @Test
+    public void testSimplify26() {
+        Sum sum = new Sum(new Variable("x"), new Sum(new Number(2), new Variable("y")));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        env.put("y", 3.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(9), simplified);
+    }
+
+    /* S27: (number + var) + var with left inner var in env */
+    @Test
+    public void testSimplify27() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("x")), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Number(3), new Variable("y")), simplified);
+    }
+
+    /* S28: (number + var) + var with both inner vars in env */
+    @Test
+    public void testSimplify28() {
+        Sum sum = new Sum(new Sum(new Number(1), new Variable("x")), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        env.put("y", 5.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(8), simplified);
+    }
+
+    /* S29: (3 * y) + z where y in env */
+    @Test
+    public void testSimplify29() {
+        Sum sum = new Sum(new Product(new Number(3), new Variable("y")), new Variable("z"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Number(6), new Variable("z")), simplified);
+    }
+
+    /* S30: (3 * y) + z with both y and z in env */
+    @Test
+    public void testSimplify30() {
+        Sum sum = new Sum(new Product(new Number(3), new Variable("y")), new Variable("z"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        env.put("z", 1.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(7), simplified);
+    }
+
+    /* S31: x + (y * 3) with y in env */
+    @Test
+    public void testSimplify31() {
+        Sum sum = new Sum(new Variable("x"), new Product(new Variable("y"), new Number(3)));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Number(6)), simplified);
+    }
+
+    /* S32: x + (y * 3) with both in env */
+    @Test
+    public void testSimplify32() {
+        Sum sum = new Sum(new Variable("x"), new Product(new Variable("y"), new Number(3)));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        env.put("y", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(10), simplified);
+    }
+
+    /* S33: 0 + x -> x (zero left identity) */
+    @Test
+    public void testSimplify33() {
+        Sum sum = new Sum(new Number(0), new Variable("x"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Variable("x"), simplified);
+    }
+
+    /* S34: x + 0 -> x (zero right identity) */
+    @Test
+    public void testSimplify34() {
+        Sum sum = new Sum(new Variable("x"), new Number(0));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Variable("x"), simplified);
+    }
+
+    /* S35: (1 * x) + y -> x + y (multiplicative identity) */
+    @Test
+    public void testSimplify35() {
+        Sum sum = new Sum(new Product(new Number(1), new Variable("x")), new Variable("y"));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Variable("y")), simplified);
+    }
+
+    /* S36: 0 + (2 + 3) -> 5 (nested numeric folding and zero drop) */
+    @Test
+    public void testSimplify36() {
+        Sum sum = new Sum(new Number(0), new Sum(new Number(2), new Number(3)));
+        Expression simplified = sum.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(5), simplified);
+    }
+
+    /* S37: case-sensitivity: env key 'X' should not bind 'x' */
+    @Test
+    public void testSimplify37() {
+        Sum sum = new Sum(new Variable("x"), new Number(2));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("X", 10.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Number(2)), simplified);
+    }
+
+    /* S38: multi-letter variable name binding */
+    @Test
+    public void testSimplify38() {
+        Sum sum = new Sum(new Variable("foo"), new Number(1));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("foo", 7.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(8), simplified);
+    }
+
+    /* S39: extra unrelated env mappings are ignored */
+    @Test
+    public void testSimplify39() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("z", 1.0);
+        env.put("w", 2.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("x"), new Variable("y")), simplified);
+    }
+
+    /* S40: floating-point bindings fold correctly (1.5 + 2.25 = 3.75) */
+    @Test
+    public void testSimplify40() {
+        Sum sum = new Sum(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 1.5);
+        env.put("y", 2.25);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Number(3.75), simplified);
+    }
+
+    /* S41: multi-letter name mismatch by case is not bound */
+    @Test
+    public void testSimplify41() {
+        Sum sum = new Sum(new Variable("foo"), new Number(1));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("Foo", 7.0);
+        Expression simplified = sum.simplify(env);
+        assertEquals(new Sum(new Variable("foo"), new Number(1)), simplified);
+    }
+
 }

@@ -1,5 +1,7 @@
 package expressivo;
 
+import java.util.Map;
+
 /**
  * An immutable data type representing a variable (case-sensitive nonempty
  * strings of letters)
@@ -81,5 +83,21 @@ public class Variable implements ExpressionWithOperation {
     @Override
     public Expression differentiate(String variable) {
         return new Number(this.name.equals(variable) ? 1 : 0);
+    }
+
+    /**
+     * Simplify this variable with respect to an environment.
+     * 
+     * @param environment maps variables to values. Variables are required to be
+     *                    case-sensitive nonempty strings of letters. The set of
+     *                    variables in environment is allowed to be different than
+     *                    the set of variables actually found in expression. Values
+     *                    must be nonnegative numbers.
+     * @return If this variable's name is in the environment, return Number with the
+     *         corresponding value; else return this variable itself.
+     */
+    @Override
+    public Expression simplify(Map<String, Double> environment) {
+        return environment.containsKey(this.name) ? new Number(environment.get(this.name)) : this;
     }
 }

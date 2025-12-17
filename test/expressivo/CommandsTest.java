@@ -15,24 +15,53 @@ public class CommandsTest {
     // Testing strategy
     // * Test assertions enabled
     //
+    // * All the valid expressions
+    // ** Only numbers
+    // *** Single number
+    // *** Only Sum of two numbers
+    // *** Only Product of two numbers
+    // *** Only Sums of more than two numbers
+    // *** Only Products of more than two numbers
+    // *** Nested Sums and Products, no parentheses, testing operator precedence
+    // *** Nested Sums and Products with parentheses altering precedence
+    // ** Only variables
+    // *** Single variable
+    // *** Only Sum of two variables
+    // *** Only Product of two variables
+    // *** Only Sums of more than two variables
+    // *** Only Products of more than two variables
+    // *** Nested Sums and Products, no parentheses, testing operator precedence
+    // *** Nested Sums and Products with parentheses altering precedence
+    // ** Mix of numbers and variables
+    // *** Sum of a number and a variable
+    // *** Product of a number and a variable
+    // *** Sums of numbers and variables
+    // *** Products of numbers and variables
+    // *** Nested Sums and Products, no parentheses, testing operator precedence
+    // *** Nested Sums and Products with parentheses altering precedence
+    //
+    // * All the invalid expressions
+    // ** Expressions with invalid characters
+    // ** Expressions with unbalanced parentheses
+    // ** Expressions with invalid syntax
+    // *** Expressions with negative numbers
+    // *** Expressions with missing operands
+    // *** Expressions with invalid variable names
+
     // * Test Commands.differentiate() method
-    // ** Partition the input space as follows:
-    // *** expressions with only single numbers
-    // *** expressions with only single variables
-    // *** expressions with sums only
-    // *** expressions with products only
-    // *** expressions with both sums and products， no parentheses， testing
-    // operator precedence
-    // *** expressions with parentheses altering precedence
-    // *** expressions with both numbers and variables
-    // *** expressions with nested sums and products
-    // *** invalid expressions
-    // **** expressions with invalid characters
-    // **** expressions with unbalanced parentheses
-    // **** expressions with invalid syntax
-    // ***** expressions with negative numbers
-    // ***** expressions with missing operands
-    // ***** expressions with invalid variable names
+    // ** test all the valid expressions:
+    // *** On every valid expression, differentiate with respect to:
+    // **** the same variable (if variable present)
+    // **** a different variable
+    // *** test all the invalid expressions
+
+    // * Test Commands.simplify() method
+    // ** test all the valid expressions:
+    // *** On every valid expression, simplify with respect to:
+    // **** an environment where no variables are present in the expression
+    // **** an environment where some variables are present in the expression
+    // **** an environment where all variables are present in the expression
+    // ** test all the invalid expressions
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -364,4 +393,380 @@ public class CommandsTest {
         Commands.differentiate("x y + z", "x");
     }
 
+    // tests for Commands.simplify()
+
+    // Valid expressions: Only numbers
+    /* S01: single number, empty env */
+    @Test
+    public void testSimplifyOnlyNumber01() {
+        String result = Commands.simplify("5", java.util.Collections.emptyMap());
+        assertEquals("5.0000", result);
+    }
+
+    /* S02: sum of two numbers, empty env */
+    @Test
+    public void testSimplifyOnlyNumber02() {
+        String result = Commands.simplify("2 + 3", java.util.Collections.emptyMap());
+        assertEquals("5.0000", result);
+    }
+
+    /* S03: product of two numbers, empty env */
+    @Test
+    public void testSimplifyOnlyNumber03() {
+        String result = Commands.simplify("2 * 4", java.util.Collections.emptyMap());
+        assertEquals("8.0000", result);
+    }
+
+    /* S04: sums of more than two numbers, empty env */
+    @Test
+    public void testSimplifyOnlyNumber04() {
+        String result = Commands.simplify("1 + 2 + 3", java.util.Collections.emptyMap());
+        assertEquals("6.0000", result);
+    }
+
+    /* S05: products of more than two numbers, empty env */
+    @Test
+    public void testSimplifyOnlyNumber05() {
+        String result = Commands.simplify("2 * 3 * 4", java.util.Collections.emptyMap());
+        assertEquals("24.0000", result);
+    }
+
+    /* S06: nested sums/products no parentheses (precedence) */
+    @Test
+    public void testSimplifyOnlyNumber06() {
+        String result = Commands.simplify("1 + 2 * 3 + 4", java.util.Collections.emptyMap());
+        // parsed as 1 + (2*3) + 4 = 1 + 6 + 4 = 11
+        assertEquals("11.0000", result);
+    }
+
+    /* S07: nested sums/products with parentheses altering precedence */
+    @Test
+    public void testSimplifyOnlyNumber07() {
+        String result = Commands.simplify("(1 + 2) * (3 + 4)", java.util.Collections.emptyMap());
+        // (3) * (7) = 21
+        assertEquals("21.0000", result);
+    }
+
+    // Valid expressions: Only variables
+    /* S08: single variable, empty env */
+    @Test
+    public void testSimplifyOnlyVariable01() {
+        String result = Commands.simplify("x", java.util.Collections.emptyMap());
+        assertEquals("x", result);
+    }
+
+    /* S09: sum of two variables, empty env */
+    @Test
+    public void testSimplifyOnlyVariable02() {
+        String result = Commands.simplify("x + y", java.util.Collections.emptyMap());
+        assertEquals("(x + y)", result);
+    }
+
+    /* S10: product of two variables, empty env */
+    @Test
+    public void testSimplifyOnlyVariable03() {
+        String result = Commands.simplify("x * y", java.util.Collections.emptyMap());
+        assertEquals("(x * y)", result);
+    }
+
+    /* S11: sums of more than two variables */
+    @Test
+    public void testSimplifyOnlyVariable04() {
+        String result = Commands.simplify("a + b + c", java.util.Collections.emptyMap());
+        assertEquals("((a + b) + c)", result);
+    }
+
+    /* S12: products of more than two variables */
+    @Test
+    public void testSimplifyOnlyVariable05() {
+        String result = Commands.simplify("a * b * c", java.util.Collections.emptyMap());
+        assertEquals("((a * b) * c)", result);
+    }
+
+    /* S13: nested sums and products no parentheses (precedence) */
+    @Test
+    public void testSimplifyOnlyVariable06() {
+        String result = Commands.simplify("x + y * z", java.util.Collections.emptyMap());
+        assertEquals("(x + (y * z))", result);
+    }
+
+    /* S14: nested with parentheses altering precedence */
+    @Test
+    public void testSimplifyOnlyVariable07() {
+        String result = Commands.simplify("(x + y) * z", java.util.Collections.emptyMap());
+        assertEquals("((x + y) * z)", result);
+    }
+
+    /* S15: variable bindings: some present */
+    @Test
+    public void testSimplifyOnlyVariableBindingsSome() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        String result = Commands.simplify("x + y", env);
+        assertEquals("(2.0000 + y)", result);
+    }
+
+    /* S16: variable bindings: all present */
+    @Test
+    public void testSimplifyOnlyVariableBindingsAll() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        env.put("y", 3.0);
+        String result = Commands.simplify("x + y", env);
+        assertEquals("5.0000", result);
+    }
+
+    // Valid expressions: Mix of numbers and variables
+    /* S17: Sum of a number and a variable, empty env */
+    @Test
+    public void testSimplifyNumVar01() {
+        String result = Commands.simplify("5 + x", java.util.Collections.emptyMap());
+        assertEquals("(5.0000 + x)", result);
+    }
+
+    /* S18: Product of a number and a variable, with variable bound */
+    @Test
+    public void testSimplifyNumVar02() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 3.0);
+        String result = Commands.simplify("5 * x", env);
+        assertEquals("15.0000", result);
+    }
+
+    /* S19: Sums of numbers and variables, some bindings */
+    @Test
+    public void testSimplifyNumVar03() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 4.0);
+        String result = Commands.simplify("2 + x + y", env);
+        assertEquals("((2.0000 + x) + 4.0000)", result);
+    }
+
+    /* S20: Products of numbers and variables, some bindings */
+    @Test
+    public void testSimplifyNumVar04() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 5.0);
+        String result = Commands.simplify("2 * x * y", env);
+        assertEquals("(10.0000 * y)", result);
+    }
+
+    /* S21: nested no parentheses (precedence), some bindings */
+    @Test
+    public void testSimplifyNumVar05() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        String result = Commands.simplify("x + 2 * y", env);
+        assertEquals("(2.0000 + (2.0000 * y))", result);
+    }
+
+    /* S22: nested with parentheses altering precedence, all bindings */
+    @Test
+    public void testSimplifyNumVar06() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 1.0);
+        env.put("y", 2.0);
+        String result = Commands.simplify("(x + 2) * y", env);
+        // (1+2)*2 = 6
+        assertEquals("6.0000", result);
+    }
+
+    // Invalid expressions for simplify(): invalid characters
+    /* SINV01: expression with invalid character $ */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidCharacter01() {
+        Commands.simplify("x + $y", java.util.Collections.emptyMap());
+    }
+
+    /* SINV02: expression with @ character */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidCharacter02() {
+        Commands.simplify("2 @ 3", java.util.Collections.emptyMap());
+    }
+
+    /* SINV03: expression with invalid operator & */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidCharacter03() {
+        Commands.simplify("x & y", java.util.Collections.emptyMap());
+    }
+
+    // Invalid expressions: unbalanced parentheses
+    /* SINV04: missing closing parenthesis */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyUnbalancedParentheses01() {
+        Commands.simplify("(x + y", java.util.Collections.emptyMap());
+    }
+
+    /* SINV05: missing opening parenthesis */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyUnbalancedParentheses02() {
+        Commands.simplify("x + y)", java.util.Collections.emptyMap());
+    }
+
+    /* SINV06: extra closing parenthesis in middle */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyUnbalancedParentheses03() {
+        Commands.simplify("(x + y) + z)", java.util.Collections.emptyMap());
+    }
+
+    // Invalid expressions: invalid syntax
+    /* SINV07: consecutive operators */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidSyntax01() {
+        Commands.simplify("x + + y", java.util.Collections.emptyMap());
+    }
+
+    /* SINV08: operator at end */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidSyntax02() {
+        Commands.simplify("x + y +", java.util.Collections.emptyMap());
+    }
+
+    /* SINV09: operator at beginning */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidSyntax03() {
+        Commands.simplify("+ x + y", java.util.Collections.emptyMap());
+    }
+
+    // Invalid expressions: negative numbers
+    /* SINV10: negative number */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyNegativeNumber01() {
+        Commands.simplify("-5", java.util.Collections.emptyMap());
+    }
+
+    /* SINV11: negative number in expression */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyNegativeNumber02() {
+        Commands.simplify("x + -3", java.util.Collections.emptyMap());
+    }
+
+    /* SINV12: negative number as operand */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyNegativeNumber03() {
+        Commands.simplify("-x * 2", java.util.Collections.emptyMap());
+    }
+
+    // Invalid expressions: missing operands
+    /* SINV13: empty parentheses */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyMissingOperand01() {
+        Commands.simplify("()", java.util.Collections.emptyMap());
+    }
+
+    /* SINV14: parentheses with only operator */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyMissingOperand02() {
+        Commands.simplify("(+)", java.util.Collections.emptyMap());
+    }
+
+    /* SINV15: missing right operand */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyMissingOperand03() {
+        Commands.simplify("x +", java.util.Collections.emptyMap());
+    }
+
+    // Invalid expressions: invalid variable names
+    /* SINV16: variable with numbers */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidVariableName01() {
+        Commands.simplify("x1 + y", java.util.Collections.emptyMap());
+    }
+
+    /* SINV17: variable with special character */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidVariableName02() {
+        Commands.simplify("x_y + z", java.util.Collections.emptyMap());
+    }
+
+    /* SINV18: expression with space in variable name */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSimplifyInvalidVariableName03() {
+        Commands.simplify("x y + z", java.util.Collections.emptyMap());
+    }
+
+    // Additional simplify tests (missing categories)
+    /* S23: three-term mixed sum, empty env (no vars bound) */
+    @Test
+    public void testSimplifyNumVar07_emptyEnv() {
+        String result = Commands.simplify("2 + x + y", java.util.Collections.emptyMap());
+        assertEquals("((2.0000 + x) + y)", result);
+    }
+
+    /* S24: three-term mixed sum, all vars bound */
+    @Test
+    public void testSimplifyNumVar08_allBound() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 3.0);
+        env.put("y", 4.0);
+        String result = Commands.simplify("2 + x + y", env);
+        assertEquals("9.0000", result);
+    }
+
+    /* S25: additive identity x + 0 simplifies to x */
+    @Test
+    public void testSimplifyIdentityAddZero1() {
+        String result = Commands.simplify("x + 0", java.util.Collections.emptyMap());
+        assertEquals("x", result);
+    }
+
+    /* S26: additive identity 0 + x simplifies to x */
+    @Test
+    public void testSimplifyIdentityAddZero2() {
+        String result = Commands.simplify("0 + x", java.util.Collections.emptyMap());
+        assertEquals("x", result);
+    }
+
+    /* S27: multiplicative identity x * 1 simplifies to x */
+    @Test
+    public void testSimplifyIdentityMulOne1() {
+        String result = Commands.simplify("x * 1", java.util.Collections.emptyMap());
+        assertEquals("x", result);
+    }
+
+    /* S28: multiplicative identity 1 * x simplifies to x */
+    @Test
+    public void testSimplifyIdentityMulOne2() {
+        String result = Commands.simplify("1 * x", java.util.Collections.emptyMap());
+        assertEquals("x", result);
+    }
+
+    /* S29: multiplicative zero x * 0 simplifies to 0 */
+    @Test
+    public void testSimplifyMulZero() {
+        String result = Commands.simplify("x * 0", java.util.Collections.emptyMap());
+        assertEquals("0.0000", result);
+    }
+
+    /* S30: multi-letter variable names and case sensitivity, empty env */
+    @Test
+    public void testSimplifyMultiLetterVars_empty() {
+        String result = Commands.simplify("foo + Bar", java.util.Collections.emptyMap());
+        assertEquals("(foo + Bar)", result);
+    }
+
+    /* S31: multi-letter variable partial binding */
+    @Test
+    public void testSimplifyMultiLetterVars_someBound() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("foo", 2.0);
+        String result = Commands.simplify("foo + Bar", env);
+        assertEquals("(2.0000 + Bar)", result);
+    }
+
+    /* S32: float formatting preserved in simplify */
+    @Test
+    public void testSimplifyFloatFormatting() {
+        String result = Commands.simplify("x + 2.5", java.util.Collections.emptyMap());
+        assertEquals("(x + 2.5000)", result);
+    }
+
+    /* S33: case-sensitivity in variable bindings */
+    @Test
+    public void testSimplifyCaseSensitivity() {
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("foo", 2.0);
+        String result = Commands.simplify("Foo + foo", env);
+        assertEquals("(Foo + 2.0000)", result);
+    }
 }

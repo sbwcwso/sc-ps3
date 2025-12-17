@@ -31,6 +31,19 @@ public class ProductTest {
     // *** differentiate with respect to left operand variable
     // *** differentiate with respect to right operand variable
     // *** differentiate with respect to both operand variables
+    //
+    // * Test simplify() method
+    // ** the basic combinations of operand types
+    // ** empty environment, 1, 2, or more mappings
+    // ** environment with extra variables not in expression
+    // ** variables with different case in environment
+    // ** variables with multi-letter names in environment
+    // ** all variables not in environment
+    // ** all variables in environment
+    // ** some variables in environment
+    // *** Only left operand variable in environment
+    // *** Only right operand variable in environment
+    // *** Both operand variables in environment
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -747,5 +760,393 @@ public class ProductTest {
         Expression derivative = product.differentiate("x");
         assertEquals(new Sum(new Product(new Number(2), new Product(new Number(3), new Variable("x"))),
                 new Product(new Product(new Variable("x"), new Number(2)), new Number(3))), derivative);
+    }
+
+    // simplify() tests (empty environment) - basic combinations
+
+    /* S01: left Number, right Number */
+    @Test
+    public void testSimplify01() {
+        Product p = new Product(new Number(2), new Number(3));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(6), s);
+    }
+
+    /* S02: left Number, right Variable */
+    @Test
+    public void testSimplify02() {
+        Product p = new Product(new Number(5), new Variable("z"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Number(5), new Variable("z")), s);
+    }
+
+    /* S03: left Number, right Sum */
+    @Test
+    public void testSimplify03() {
+        Product p = new Product(new Number(1), new Sum(new Variable("x"), new Number(2)));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Sum(new Variable("x"), new Number(2)), s);
+    }
+
+    /* S04: left Number, right Product */
+    @Test
+    public void testSimplify04() {
+        Product p = new Product(new Number(4), new Product(new Variable("x"), new Number(2)));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Number(4), new Product(new Variable("x"), new Number(2))), s);
+    }
+
+    /* S05: left Variable, right Number */
+    @Test
+    public void testSimplify05() {
+        Product p = new Product(new Variable("a"), new Number(10));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Variable("a"), new Number(10)), s);
+    }
+
+    /* S06: left Variable, right Variable */
+    @Test
+    public void testSimplify06() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Variable("x"), new Variable("y")), s);
+    }
+
+    /* S07: left Variable, right Sum */
+    @Test
+    public void testSimplify07() {
+        Product p = new Product(new Variable("x"), new Sum(new Number(2), new Variable("y")));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Variable("x"), new Sum(new Number(2), new Variable("y"))), s);
+    }
+
+    /* S08: left Variable, right Product */
+    @Test
+    public void testSimplify08() {
+        Product p = new Product(new Variable("x"), new Product(new Number(3), new Variable("y")));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Variable("x"), new Product(new Number(3), new Variable("y"))), s);
+    }
+
+    /* S09: left Product, right Number */
+    @Test
+    public void testSimplify09() {
+        Product p = new Product(new Product(new Number(1), new Number(2)), new Number(3));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(6), s);
+    }
+
+    /* S10: left Product, right Variable */
+    @Test
+    public void testSimplify10() {
+        Product p = new Product(new Product(new Variable("x"), new Number(2)), new Variable("y"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Product(new Variable("x"), new Number(2)), new Variable("y")), s);
+    }
+
+    /* S11: left Product, right Product */
+    @Test
+    public void testSimplify11() {
+        Product p = new Product(new Product(new Number(1), new Number(2)), new Product(new Number(3), new Number(4)));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(24), s);
+    }
+
+    /* S12: left Product, right Sum */
+    @Test
+    public void testSimplify12() {
+        Product p = new Product(new Product(new Variable("x"), new Number(2)),
+                new Sum(new Number(3), new Variable("y")));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(
+                new Product(new Product(new Variable("x"), new Number(2)), new Sum(new Number(3), new Variable("y"))),
+                s);
+    }
+
+    /* S13: left Sum, right Number */
+    @Test
+    public void testSimplify13() {
+        Product p = new Product(new Sum(new Number(1), new Number(2)), new Number(3));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(9), s);
+    }
+
+    /* S14: left Sum, right Variable */
+    @Test
+    public void testSimplify14() {
+        Product p = new Product(new Sum(new Number(3), new Variable("y")), new Variable("z"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Sum(new Number(3), new Variable("y")), new Variable("z")), s);
+    }
+
+    /* S15: left Sum, right Product */
+    @Test
+    public void testSimplify15() {
+        Product p = new Product(new Sum(new Variable("x"), new Number(2)),
+                new Product(new Number(3), new Variable("y")));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(
+                new Product(new Sum(new Variable("x"), new Number(2)), new Product(new Number(3), new Variable("y"))),
+                s);
+    }
+
+    /* S16: left Sum, right Sum */
+    @Test
+    public void testSimplify16() {
+        Product p = new Product(new Sum(new Variable("x"), new Number(2)), new Sum(new Number(3), new Variable("y")));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Sum(new Variable("x"), new Number(2)), new Sum(new Number(3), new Variable("y"))),
+                s);
+    }
+
+    // Product environment-partition tests (S17..S32)
+
+    /* S17: number*number unchanged with non-empty env */
+    @Test
+    public void testSimplify17() {
+        Product p = new Product(new Number(2), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 9.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(6), s);
+    }
+
+    /* S18: number * variable where variable in env */
+    @Test
+    public void testSimplify18() {
+        Product p = new Product(new Number(2), new Variable("x"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(6), s);
+    }
+
+    /* S19: number * variable with unrelated env */
+    @Test
+    public void testSimplify19() {
+        Product p = new Product(new Number(2), new Variable("x"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Number(2), new Variable("x")), s);
+    }
+
+    /* S20: variable * number where left variable is in env */
+    @Test
+    public void testSimplify20() {
+        Product p = new Product(new Variable("x"), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(12), s);
+    }
+
+    /* S21: variable * number with unrelated env */
+    @Test
+    public void testSimplify21() {
+        Product p = new Product(new Variable("x"), new Number(3));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Number(3)), s);
+    }
+
+    /* S22: var * var with only left in env */
+    @Test
+    public void testSimplify22() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Number(2), new Variable("y")), s);
+    }
+
+    /* S23: var * var with only right in env */
+    @Test
+    public void testSimplify23() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Number(3)), s);
+    }
+
+    /* S24: var * var with both in env */
+    @Test
+    public void testSimplify24() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        env.put("y", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(6), s);
+    }
+
+    /* S25: var * (number * var) with right inner var in env */
+    @Test
+    public void testSimplify25() {
+        Product p = new Product(new Variable("x"), new Product(new Number(2), new Variable("y")));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Number(6)), s);
+    }
+
+    /* S26: var * (number * var) with both vars in env */
+    @Test
+    public void testSimplify26() {
+        Product p = new Product(new Variable("x"), new Product(new Number(2), new Variable("y")));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        env.put("y", 3.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(24), s);
+    }
+
+    /* S27: (number * var) * var with left inner var in env */
+    @Test
+    public void testSimplify27() {
+        Product p = new Product(new Product(new Number(1), new Variable("x")), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Number(2), new Variable("y")), s);
+    }
+
+    /* S28: (number * var) * var with both inner vars in env */
+    @Test
+    public void testSimplify28() {
+        Product p = new Product(new Product(new Number(1), new Variable("x")), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 2.0);
+        env.put("y", 5.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(10), s);
+    }
+
+    /* S29: (3 * y) * z where y in env */
+    @Test
+    public void testSimplify29() {
+        Product p = new Product(new Product(new Number(3), new Variable("y")), new Variable("z"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Number(6), new Variable("z")), s);
+    }
+
+    /* S30: (3 * y) * z with both y and z in env */
+    @Test
+    public void testSimplify30() {
+        Product p = new Product(new Product(new Number(3), new Variable("y")), new Variable("z"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        env.put("z", 1.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(6), s);
+    }
+
+    /* S31: x * (y * 3) with y in env */
+    @Test
+    public void testSimplify31() {
+        Product p = new Product(new Variable("x"), new Product(new Variable("y"), new Number(3)));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("y", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Number(6)), s);
+    }
+
+    /* S32: x * (y * 3) with both in env */
+    @Test
+    public void testSimplify32() {
+        Product p = new Product(new Variable("x"), new Product(new Variable("y"), new Number(3)));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 4.0);
+        env.put("y", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(24), s);
+    }
+
+    /* S33: 0 * x -> 0 */
+    @Test
+    public void testSimplify33() {
+        Product p = new Product(new Number(0), new Variable("x"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(0), s);
+    }
+
+    /* S34: x * 1 -> x */
+    @Test
+    public void testSimplify34() {
+        Product p = new Product(new Variable("x"), new Number(1));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Variable("x"), s);
+    }
+
+    /* S35: (1 * x) * y -> x * y */
+    @Test
+    public void testSimplify35() {
+        Product p = new Product(new Product(new Number(1), new Variable("x")), new Variable("y"));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Product(new Variable("x"), new Variable("y")), s);
+    }
+
+    /* S36: 0 * (2 * 3) -> 0 */
+    @Test
+    public void testSimplify36() {
+        Product p = new Product(new Number(0), new Product(new Number(2), new Number(3)));
+        Expression s = p.simplify(java.util.Collections.emptyMap());
+        assertEquals(new Number(0), s);
+    }
+
+    /* S37: case-sensitivity: env key 'X' should not bind 'x' */
+    @Test
+    public void testSimplify37() {
+        Product p = new Product(new Variable("x"), new Number(2));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("X", 10.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Number(2)), s);
+    }
+
+    /* S38: multi-letter variable binding */
+    @Test
+    public void testSimplify38() {
+        Product p = new Product(new Variable("foo"), new Number(1));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("foo", 7.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(7), s);
+    }
+
+    /* S39: extra unrelated env mappings are ignored */
+    @Test
+    public void testSimplify39() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("z", 1.0);
+        env.put("w", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Product(new Variable("x"), new Variable("y")), s);
+    }
+
+    /* S40: floating-point bindings fold correctly (1.5 * 2.0 = 3.0) */
+    @Test
+    public void testSimplify40() {
+        Product p = new Product(new Variable("x"), new Variable("y"));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 1.5);
+        env.put("y", 2.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Number(3.0), s);
+    }
+
+    /* S41: multi-letter name case mismatch is not bound */
+    @Test
+    public void testSimplify41() {
+        Product p = new Product(new Variable("foo"), new Number(1));
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("Foo", 7.0);
+        Expression s = p.simplify(env);
+        assertEquals(new Variable("foo"), s);
     }
 }

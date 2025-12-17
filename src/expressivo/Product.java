@@ -93,4 +93,24 @@ public class Product implements ExpressionWithOperation {
         Expression rightPart = ((ExpressionWithOperation) left).mulRight(rightDerivative);
         return ((ExpressionWithOperation) leftPart).addToRight(rightPart);
     }
+
+    /**
+     * Simplify this product with respect to an environment.
+     * 
+     * @param environment maps variables to values. Variables are required to be
+     *                    case-sensitive nonempty strings of letters. The set of
+     *                    variables in environment is allowed to be different than
+     *                    the set of variables actually found in expression. Values
+     *                    must be nonnegative numbers.
+     * @return the simplified expression after simplifying left and right with
+     *         respect to the environment. The simplified rule:
+     *         If either left or right is 0, return Number(0);
+     *         If either left or right is 1, drop it;
+     *         If both left and right are numbers, fold them into a single number
+     */
+    public Expression simplify(java.util.Map<String, Double> environment) {
+        Expression simplifiedLeft = left.simplify(environment);
+        Expression simplifiedRight = right.simplify(environment);
+        return ((ExpressionWithOperation) simplifiedLeft).mulRight(simplifiedRight);
+    }
 }

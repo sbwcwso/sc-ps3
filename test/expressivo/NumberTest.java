@@ -8,6 +8,7 @@ import org.junit.Test;
  */
 public class NumberTest {
     // Testing strategy
+    //
     // * Test toString() method
     // ** Partition the input space as follows:
     // *** integer values (e.g., 0, 1, 42)
@@ -15,14 +16,21 @@ public class NumberTest {
     // *** boundary values (e.g., 0.0, very large values)
     // *** invalid values (e.g., negative numbers)
     // ** rounding behavior (e.g., values that test round half up)
+    //
     // * Test equals() and hashCode() method
     // ** Partition the input space as follows:
     // *** equal int numbers
     // *** equal floating-point numbers
     // *** unequal numbers
+    //
     // * Test differentiate() method
     // ** Partition the input space as follows:
     // *** differentiate with respect to any variable
+    //
+    // * Test simplify() method
+    // ** Partition the input space as follows:
+    // *** env is empty
+    // *** env has 1, 2, or more mappings
 
     @Test(expected = AssertionError.class)
     public void testAssertionsEnabled() {
@@ -113,5 +121,40 @@ public class NumberTest {
         Number num = new Number(5.0);
         Expression derivative = num.differentiate("x");
         assertEquals(new Number(0), derivative);
+    }
+
+    // simplify() partition tests
+    @Test
+    public void testSimplifyEmptyEnv() {
+        Number n = new Number(7.0);
+        assertEquals(n, n.simplify(java.util.Collections.emptyMap()));
+    }
+
+    @Test
+    public void testSimplifyOneMapping() {
+        Number n = new Number(3.0);
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 1.0);
+        assertEquals(n, n.simplify(env));
+    }
+
+    @Test
+    public void testSimplifyTwoMappings() {
+        Number n = new Number(2.5);
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("x", 1.0);
+        env.put("y", 4.0);
+        assertEquals(n, n.simplify(env));
+    }
+
+    @Test
+    public void testSimplifyManyMappings() {
+        Number n = new Number(0);
+        java.util.Map<String, Double> env = new java.util.HashMap<>();
+        env.put("a", 1.0);
+        env.put("b", 2.0);
+        env.put("c", 3.0);
+        env.put("d", 4.0);
+        assertEquals(n, n.simplify(env));
     }
 }
